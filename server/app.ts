@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-7', legacyHeaders: false }));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-app.use('/api/auth', authRouter);
+app.use('/api/session', authRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/contact', contactRouter);

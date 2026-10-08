@@ -710,7 +710,7 @@ app.use(import_express7.default.json({ limit: "16kb" }));
 app.use((0, import_cookie_parser.default)());
 app.use("/api", (0, import_express_rate_limit5.default)({ windowMs: 6e4, limit: 120, standardHeaders: "draft-7", legacyHeaders: false }));
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
-app.use("/api/auth", authRouter);
+app.use("/api/session", authRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/contact", contactRouter);
