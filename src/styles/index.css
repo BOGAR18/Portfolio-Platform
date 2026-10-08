@@ -70,3 +70,21 @@ img {
   max-width: 100%;
   height: auto;
 }
+/* Cegah lebar halaman melebihi layar HP */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Cegah HP memperbesar teks secara otomatis saat orientasi berubah */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}

@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, ChevronDown, X, FolderOpen } from "lucide-react";
+import { Search, ChevronDown, X} from "lucide-react";
 import { useT } from "@/i18n";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useProjects, type ProjectFilters } from "@/features/projects/hooks";
@@ -30,23 +30,26 @@ export default function Projects() {
   };
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:py-16 md:grid-cols-5 md:gap-10">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-700 to-slate-900 p-8 text-white md:p-12"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-slate-900 p-6 text-white sm:rounded-3xl sm:p-10 md:p-12"
       >
-        <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-white/10 blur-3xl" aria-hidden />
-        <p className="text-sm font-medium uppercase tracking-widest text-brand-100">
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-white/10 blur-3xl"
+          aria-hidden
+        />
+        <p className="text-xs font-medium uppercase tracking-widest text-brand-100 sm:text-sm">
           {t("projects.title")}
         </p>
-        <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-5xl">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
           {t("projects.title")}
         </h1>
-        <p className="mt-3 text-brand-100">
-          {projects.data ? `${projects.data.length}` : "…"} proyek ditemukan
+        <p className="mt-2 text-sm text-brand-100 sm:mt-3 sm:text-base">
+          {t("projects.found", { count: projects.data?.length ?? "…" })}
         </p>
       </motion.header>
 
@@ -55,19 +58,22 @@ export default function Projects() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.4 }}
-        className="sticky top-20 z-30 mt-6 space-y-4 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/80"
+        className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm backdrop-blur sm:mt-6 sm:p-4 md:sticky md:top-20 md:z-30 dark:border-slate-800 dark:bg-slate-900/90"
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           {/* Search */}
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+          <div className="relative min-w-0 flex-1">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+              aria-hidden
+            />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("projects.search")}
               aria-label={t("projects.search")}
-              className="w-full rounded-lg border border-slate-300 bg-transparent py-2 pl-9 pr-9 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 dark:border-slate-700"
+              className="w-full rounded-lg border border-slate-300 bg-transparent py-2.5 pl-9 pr-9 text-base outline-none transition-shadow focus:ring-2 focus:ring-brand-500 sm:text-sm dark:border-slate-700"
             />
             <AnimatePresence>
               {search && (
@@ -77,7 +83,7 @@ export default function Projects() {
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => setSearch("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white"
-                  aria-label="Clear search"
+                  aria-label={t("projects.clearSearch")}
                 >
                   <X className="size-4" />
                 </motion.button>
@@ -90,18 +96,25 @@ export default function Projects() {
             <select
               value={sort}
               onChange={(e) => setParam("sort", e.target.value)}
-              aria-label="Sort"
-              className="w-full appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-4 pr-10 text-sm outline-none transition-colors hover:border-brand-500 focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-900"
+              aria-label={t("projects.sortLabel")}
+              className="w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-4 pr-10 text-base outline-none transition-colors hover:border-brand-500 focus:ring-2 focus:ring-brand-500 sm:text-sm dark:border-slate-700 dark:bg-slate-900"
             >
               <option value="newest">{t("projects.sort.newest")}</option>
               <option value="title">{t("projects.sort.title")}</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-500" aria-hidden />
+            <ChevronDown
+              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-500"
+              aria-hidden
+            />
           </div>
         </div>
 
-        {/* Chip skill */}
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by skill">
+        {/* Chip skill: bisa digeser ke samping di HP */}
+        <div
+          className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible"
+          role="group"
+          aria-label={t("projects.filterBySkill")}
+        >
           {[{ name: "" }, ...skillOptions.map((n) => ({ name: n }))].map((opt) => {
             const active = skill === opt.name;
             return (
@@ -109,7 +122,7 @@ export default function Projects() {
                 key={opt.name || "all"}
                 onClick={() => setParam("skill", opt.name)}
                 aria-pressed={active}
-                className={`relative rounded-full px-3.5 py-1 text-sm font-medium transition-colors ${
+                className={`relative shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                   active
                     ? "text-white"
                     : "border border-slate-300 text-slate-600 hover:border-brand-500 hover:text-brand-600 dark:border-slate-700 dark:text-slate-300 dark:hover:text-brand-300"
@@ -118,7 +131,7 @@ export default function Projects() {
                 {active && (
                   <motion.span
                     layoutId="skill-chip"
-                    className="absolute inset-0 -z-0 rounded-full bg-brand-600"
+                    className="absolute inset-0 rounded-full bg-brand-600"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -130,19 +143,16 @@ export default function Projects() {
       </motion.div>
 
       {/* Daftar proyek */}
-      <div className="mt-10">
+      <div className="mt-8 sm:mt-10">
         {projects.isLoading && <LoadingState />}
         {projects.isError && (
           <ErrorState message={t("common.error")} onRetry={() => projects.refetch()} />
         )}
         {projects.data && projects.data.length === 0 && (
-          <div className="flex flex-col items-center gap-3 py-16 text-center text-slate-500">
-            <FolderOpen className="size-10 text-brand-400" aria-hidden />
-            <EmptyState message={t("projects.empty")} />
-          </div>
+          <EmptyState message={t("projects.empty")} />
         )}
         {projects.data && projects.data.length > 0 && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {projects.data.map((p, i) => (
               <ProjectCard key={p.id} project={p} index={i} />
             ))}
