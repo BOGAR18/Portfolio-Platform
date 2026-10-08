@@ -2,16 +2,15 @@
   "name": "portfolio-platform",
   "private": true,
   "version": "1.0.0",
-  "scripts": {
-    "dev": "concurrently -n web,api -c cyan,green \"vite\" \"tsx watch server/index.ts\"",
-    "build": "tsc --noEmit && vite build",
-    "test": "vitest run",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed",
-    "db:studio": "prisma studio",
-    "build:api": "esbuild server/vercel.ts --bundle --platform=node --format=cjs --packages=external --outfile=\"api/[...path].js\"",
-    "build:auth": "esbuild api/auth.ts --bundle --platform=node --format=cjs --packages=external --outfile=api/auth.js"
-  },
+"scripts": {
+  "dev": "concurrently -n web,api -c cyan,green \"vite\" \"tsx watch server/index.ts\"",
+  "build": "tsc --noEmit && vite build",
+  "test": "vitest run",
+  "db:migrate": "prisma migrate dev",
+  "db:seed": "prisma db seed",
+  "db:studio": "prisma studio",
+  "build:api": "esbuild server/vercel.ts --bundle --platform=node --format=cjs --packages=external --outfile=\"api/[...path].js\""
+},
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
