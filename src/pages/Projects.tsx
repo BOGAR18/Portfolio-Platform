@@ -30,7 +30,7 @@ export default function Projects() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
+    <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:py-16 md:grid-cols-5 md:gap-10">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: 16 }}

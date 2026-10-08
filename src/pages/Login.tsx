@@ -45,13 +45,13 @@ export default function Login() {
     "w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-950 dark:focus:bg-slate-950";
 
   return (
-    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-16">
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-10 sm:py-16">
       <div
-        className="pointer-events-none absolute -left-24 -top-24 size-96 rounded-full bg-brand-500/20 blur-3xl"
+        className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-500/20 blur-3xl sm:size-96"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -bottom-24 -right-24 size-96 rounded-full bg-brand-700/20 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -right-24 size-72 rounded-full bg-brand-700/20 blur-3xl sm:size-96"
         aria-hidden
       />
 
@@ -59,9 +59,9 @@ export default function Login() {
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none"
+        className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-2xl shadow-slate-200/60 backdrop-blur sm:p-8 dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none"
       >
-        <div className="mb-8 text-center">
+        <div className="mb-6 text-center sm:mb-8">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30">
             <Lock className="size-6" aria-hidden />
           </div>
@@ -119,10 +119,10 @@ export default function Login() {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               role="alert"
-              className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300"
+              className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300"
             >
-              <AlertCircle className="size-4 shrink-0" aria-hidden />
-              {serverError}
+              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+              <span className="min-w-0 break-words">{serverError}</span>
             </motion.div>
           )}
 

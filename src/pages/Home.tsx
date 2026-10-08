@@ -42,7 +42,7 @@ export default function Home() {
 
 
   return (
-    <div className="mx-auto max-w-6xl space-y-20 px-4 py-16">
+    <div className="mx-auto max-w-6xl space-y-14 px-4 py-10 sm:space-y-20 sm:py-16">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600/10 via-transparent to-transparent p-8 md:p-14">
         <div
@@ -62,7 +62,7 @@ export default function Home() {
               <p className="text-sm font-medium uppercase tracking-widest text-brand-600 dark:text-brand-500">
                 {data.profile.location}
               </p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-6xl">
+              <h1 className="mt-3 break-words text-3xl font-bold tracking-tight sm:text-4xl md:text-6xl">
                 {data.profile.name}
               </h1>
               <p className="mt-2 text-xl text-slate-600 dark:text-slate-300">
@@ -98,7 +98,7 @@ export default function Home() {
               <img
                 src={data.profile.photoUrl}
                 alt={data.profile.name}
-               className="size-40 shrink-0 rounded-2xl object-cover object-top shadow-xl ring-4 ring-white md:size-56 dark:ring-slate-800"
+              className="size-32 shrink-0 self-center rounded-2xl object-cover object-top shadow-xl ring-4 ring-white sm:size-40 md:size-56 dark:ring-slate-800"
               />
             )}
           </motion.div>
@@ -134,7 +134,7 @@ export default function Home() {
           />
         )}
 
-        <div className="grid gap-6 md:grid-cols-3">
+       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {featured.map((p, i) => (
             <ProjectCard key={p.id} project={p} index={i} />
           ))}

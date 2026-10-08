@@ -28,7 +28,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4" aria-label="Main">
+     <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:h-16" aria-label="Main">
         <Link to="/" className="font-bold tracking-tight">
           Bogar<span className="text-brand-500">25.dev</span>
         </Link>
@@ -40,7 +40,7 @@ export default function Navbar() {
           {isAdmin && <NavLink to="/admin/projects" className={linkClass}>{t('nav.admin')}</NavLink>}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <button
             onClick={() => setLocale(locale === 'en' ? 'id' : 'en')}
             className="rounded-md p-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800"
