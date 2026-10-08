@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  VISITOR
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  SPAM
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(VISITOR)
+  createdAt    DateTime @default(now())
+}
+
+model Profile {
+  id       String  @id @default(cuid())
+  name     String
+  title    String
+  bio      String
+  location String
+  github   String?
+  linkedin String?
+  cvUrl    String?
+  photoUrl String?
+  translations Json @default("{}")
+}
+
+model Experience {
+  id           String   @id @default(cuid())
+  company      String
+  position     String
+  period       String
+  description  String
+  technologies String[]
+  order        Int      @default(0)
+  translations Json @default("{}")
+}
+
+model Skill {
+  id       String         @id @default(cuid())
+  name     String         @unique
+  category String
+  level    Int            @default(3)
+  projects ProjectSkill[]
+}
+
+model Project {
+  id        String         @id @default(cuid())
+  slug      String         @unique
+  title     String
+  summary   String
+  problem   String?
+  solution  String?
+  role      String?
+  category  String
+  githubUrl String?
+  liveUrl   String?
+  imageUrl  String?
+  featured  Boolean        @default(false)
+  published Boolean        @default(true)
+  deletedAt DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  skills    ProjectSkill[]
+  translations Json @default("{}")
+
+  @@index([published, deletedAt])
+}
+
+// Tabel penghubung many-to-many antara Project dan Skill
+model ProjectSkill {
+  projectId String
+  skillId   String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, skillId])
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    ContactStatus @default(NEW)
+  createdAt DateTime      @default(now())
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  type        String
+  path        String
+  visitorHash String
+  createdAt   DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
