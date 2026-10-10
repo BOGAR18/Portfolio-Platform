@@ -11,6 +11,11 @@ const schema = z.object({
   ADMIN_PASSWORD: z.string().min(8),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default('claude-haiku-4-5'),
+    RESEND_API_KEY: z.string().optional(),
+  CONTACT_TO_EMAIL: z.string().email().optional(),
+  FONNTE_TOKEN: z.string().optional(),
+  WA_TARGET: z.string().regex(/^\d+$/, '6281385000960').optional(),
+    TRANSLATE_EMAIL: z.string().email().optional(),
 });
 
 // Jika ada variabel di .env yang kurang, aplikasi berhenti dengan pesan yang jelas

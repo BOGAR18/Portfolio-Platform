@@ -1,17 +1,18 @@
-import type { Project, ProjectSkill, Skill } from '@prisma/client';
-import type { Locale, ProjectDto } from '../../shared/types';
+import type { Project, ProjectSkill, Skill, ProjectImage } from '@prisma/client';
 import { pickLocalized } from './i18n';
 
-type ProjectWithSkills = Project & { skills: (ProjectSkill & { skill: Skill })[] };
+// Project beserta relasi yang dipakai untuk membuat DTO
+export type ProjectWithSkills = Project & {
+  skills: (ProjectSkill & { skill: Skill })[];
+  images?: ProjectImage[];
+};
 
-// Mengubah bentuk data database menjadi bentuk yang dikirim ke frontend, dalam bahasa yang diminta
-export function toProjectDto(p: ProjectWithSkills, lang: Locale = 'en'): ProjectDto {
+export function toProjectDto(p: ProjectWithSkills, lang: 'en' | 'id' = 'en') {
   const loc = pickLocalized(
     { title: p.title, summary: p.summary, problem: p.problem, solution: p.solution, role: p.role },
     p.translations,
     lang,
   );
-
   return {
     id: p.id,
     slug: p.slug,
@@ -26,6 +27,7 @@ export function toProjectDto(p: ProjectWithSkills, lang: Locale = 'en'): Project
     featured: p.featured,
     imageUrl: p.imageUrl,
     skills: p.skills.map((s) => s.skill.name),
+    images: (p.images ?? []).map((img) => ({ url: img.url, caption: img.caption })),
     createdAt: p.createdAt.toISOString(),
   };
 }

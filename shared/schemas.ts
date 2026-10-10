@@ -38,6 +38,15 @@ export const projectInputSchema = z.object({
   published: z.boolean().default(true),
   skills: z.array(z.string().trim().min(1)).default([]),
   imageUrl: z.string().optional().or(z.literal('')),
+    images: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        caption: z.string().trim().max(120).optional(),
+      }),
+    )
+    .max(20)
+    .default([]),
   translations: z
   .object({
     en: z.record(z.string()).optional(),
@@ -68,4 +77,13 @@ export const chatSchema = z.object({
 export const analyticsSchema = z.object({
   type: z.enum(['pageview', 'cv_download', 'contact_click', 'project_view']),
   path: z.string().max(200),
+});
+
+export const experienceInputSchema = z.object({
+  company: z.string().trim().min(2).max(120),
+  position: z.string().trim().min(2).max(120),
+  period: z.string().trim().min(3).max(60),
+  description: z.string().trim().min(10).max(2000),
+  technologies: z.array(z.string().trim().min(1)).default([]),
+  order: z.coerce.number().int().min(0).max(999).default(0),
 });

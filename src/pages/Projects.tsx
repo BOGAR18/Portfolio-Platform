@@ -32,23 +32,15 @@ export default function Projects() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
       {/* Header */}
-      <motion.header
+           <motion.header
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-slate-900 p-6 text-white sm:rounded-3xl sm:p-10 md:p-12"
+        className="border-b border-slate-200 pb-8 dark:border-slate-800"
       >
-        <div
-          className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-white/10 blur-3xl"
-          aria-hidden
-        />
-        <p className="text-xs font-medium uppercase tracking-widest text-brand-100 sm:text-sm">
-          {t("projects.title")}
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-          {t("projects.title")}
-        </h1>
-        <p className="mt-2 text-sm text-brand-100 sm:mt-3 sm:text-base">
+        <p className="eyebrow">{t("projects.title")}</p>
+        <h1 className="mt-3 text-4xl leading-tight sm:text-5xl">{t("projects.title")}</h1>
+        <p className="mt-3 text-sm text-slate-500">
           {t("projects.found", { count: projects.data?.length ?? "…" })}
         </p>
       </motion.header>

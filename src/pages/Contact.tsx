@@ -2,7 +2,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { motion } from "motion/react";
-import { Mail, Send, ShieldCheck } from "lucide-react";
+import { Send, ShieldCheck } from "lucide-react";
+import { ContactArt } from "@/components/Illustrations";
 import { contactSchema } from "@shared/schemas";
 import { useT } from "@/i18n";
 import { ApiError } from "@/lib/api";
@@ -21,7 +22,13 @@ export default function Contact() {
     formState: { errors },
   } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", subject: "", message: "", website: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+      website: "",
+    },
   });
 
   const onSubmit = handleSubmit(async (values) => {
@@ -56,22 +63,18 @@ export default function Contact() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="md:col-span-2"
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-slate-900 p-6 text-white sm:rounded-3xl sm:p-8">
-          <div
-            className="pointer-events-none absolute -bottom-16 -right-16 size-56 rounded-full bg-white/10 blur-3xl"
-            aria-hidden
-          />
-          <Mail className="size-7 text-brand-100 sm:size-8" aria-hidden />
-          <h1 className="mt-4 text-2xl font-bold tracking-tight sm:mt-6 sm:text-3xl">
+        <div className="flex h-full flex-col rounded-xl border border-slate-200 p-6 sm:p-8 dark:border-slate-800">
+          <ContactArt className="h-28 w-auto text-brand-700 dark:text-brand-300" />
+          <h1 className="mt-8 text-3xl leading-tight sm:text-4xl">
             {t("contact.title")}
           </h1>
-          <p className="mt-3 text-sm text-brand-100 sm:text-base">{t("contact.subtitle")}</p>
-          <ul className="mt-6 space-y-3 text-sm text-brand-100 sm:mt-8">
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
-              <span>{t("contact.privacy")}</span>
-            </li>
-          </ul>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base dark:text-slate-400">
+            {t("contact.subtitle")}
+          </p>
+          <p className="mt-auto flex items-start gap-2 pt-8 text-sm text-slate-500">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <span>{t("contact.privacy")}</span>
+          </p>
         </div>
       </motion.aside>
 
@@ -82,11 +85,13 @@ export default function Contact() {
         transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         onSubmit={onSubmit}
         noValidate
-        className="min-w-0 space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/50 sm:rounded-3xl sm:p-8 md:col-span-3 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none"
+        className="min-w-0 space-y-5 rounded-xl border border-slate-200 bg-white p-5 sm:p-8 md:col-span-3 dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="min-w-0">
-            <label htmlFor="name" className={labelClass}>{t("contact.name")}</label>
+            <label htmlFor="name" className={labelClass}>
+              {t("contact.name")}
+            </label>
             <input
               id="name"
               className={inputClass}
@@ -95,10 +100,14 @@ export default function Contact() {
               {...register("name")}
               aria-invalid={!!errors.name}
             />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+            )}
           </div>
           <div className="min-w-0">
-            <label htmlFor="email" className={labelClass}>{t("contact.email")}</label>
+            <label htmlFor="email" className={labelClass}>
+              {t("contact.email")}
+            </label>
             <input
               id="email"
               type="email"
@@ -108,12 +117,18 @@ export default function Contact() {
               {...register("email")}
               aria-invalid={!!errors.email}
             />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-600">
+                {errors.email.message}
+              </p>
+            )}
           </div>
         </div>
 
         <div>
-          <label htmlFor="subject" className={labelClass}>{t("contact.subject")}</label>
+          <label htmlFor="subject" className={labelClass}>
+            {t("contact.subject")}
+          </label>
           <input
             id="subject"
             className={inputClass}
@@ -121,11 +136,17 @@ export default function Contact() {
             {...register("subject")}
             aria-invalid={!!errors.subject}
           />
-          {errors.subject && <p className="mt-1 text-xs text-red-600">{errors.subject.message}</p>}
+          {errors.subject && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.subject.message}
+            </p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="message" className={labelClass}>{t("contact.message")}</label>
+          <label htmlFor="message" className={labelClass}>
+            {t("contact.message")}
+          </label>
           <textarea
             id="message"
             rows={5}
@@ -134,7 +155,11 @@ export default function Contact() {
             {...register("message")}
             aria-invalid={!!errors.message}
           />
-          {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message.message}</p>}
+          {errors.message && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.message.message}
+            </p>
+          )}
         </div>
 
         {/* Honeypot: disembunyikan dari manusia */}
@@ -145,7 +170,11 @@ export default function Contact() {
           </label>
         </div>
 
-        <button type="submit" disabled={send.isPending} className="btn-primary group w-full py-3">
+        <button
+          type="submit"
+          disabled={send.isPending}
+          className="btn-primary group w-full py-3"
+        >
           <Send className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           {send.isPending ? t("contact.sending") : t("contact.submit")}
         </button>

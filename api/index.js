@@ -35,7 +35,7 @@ __export(vercel_exports, {
 module.exports = __toCommonJS(vercel_exports);
 
 // server/app.ts
-var import_express7 = __toESM(require("express"));
+var import_express8 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
 var import_helmet = __toESM(require("helmet"));
 var import_cookie_parser = __toESM(require("cookie-parser"));
@@ -53,7 +53,12 @@ var schema = import_zod.z.object({
   ADMIN_EMAIL: import_zod.z.string().email(),
   ADMIN_PASSWORD: import_zod.z.string().min(8),
   ANTHROPIC_API_KEY: import_zod.z.string().optional(),
-  ANTHROPIC_MODEL: import_zod.z.string().default("claude-haiku-4-5")
+  ANTHROPIC_MODEL: import_zod.z.string().default("claude-haiku-4-5"),
+  RESEND_API_KEY: import_zod.z.string().optional(),
+  CONTACT_TO_EMAIL: import_zod.z.string().email().optional(),
+  FONNTE_TOKEN: import_zod.z.string().optional(),
+  WA_TARGET: import_zod.z.string().regex(/^\d+$/, "6281385000960").optional(),
+  TRANSLATE_EMAIL: import_zod.z.string().email().optional()
 });
 var env = schema.parse(process.env);
 
@@ -123,6 +128,12 @@ var projectInputSchema = import_zod3.z.object({
   published: import_zod3.z.boolean().default(true),
   skills: import_zod3.z.array(import_zod3.z.string().trim().min(1)).default([]),
   imageUrl: import_zod3.z.string().optional().or(import_zod3.z.literal("")),
+  images: import_zod3.z.array(
+    import_zod3.z.object({
+      url: import_zod3.z.string().url(),
+      caption: import_zod3.z.string().trim().max(120).optional()
+    })
+  ).max(20).default([]),
   translations: import_zod3.z.object({
     en: import_zod3.z.record(import_zod3.z.string()).optional(),
     id: import_zod3.z.record(import_zod3.z.string()).optional()
@@ -141,6 +152,14 @@ var chatSchema = import_zod3.z.object({
 var analyticsSchema = import_zod3.z.object({
   type: import_zod3.z.enum(["pageview", "cv_download", "contact_click", "project_view"]),
   path: import_zod3.z.string().max(200)
+});
+var experienceInputSchema = import_zod3.z.object({
+  company: import_zod3.z.string().trim().min(2).max(120),
+  position: import_zod3.z.string().trim().min(2).max(120),
+  period: import_zod3.z.string().trim().min(3).max(60),
+  description: import_zod3.z.string().trim().min(10).max(2e3),
+  technologies: import_zod3.z.array(import_zod3.z.string().trim().min(1)).default([]),
+  order: import_zod3.z.coerce.number().int().min(0).max(999).default(0)
 });
 
 // server/lib/prisma.ts
@@ -240,13 +259,81 @@ function toProjectDto(p, lang = "en") {
     featured: p.featured,
     imageUrl: p.imageUrl,
     skills: p.skills.map((s) => s.skill.name),
+    images: (p.images ?? []).map((img) => ({ url: img.url, caption: img.caption })),
     createdAt: p.createdAt.toISOString()
   };
 }
 
+// server/services/translate.ts
+var MAX_BYTES = 450;
+function chunkText(text) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const chunks = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (Buffer.byteLength(next, "utf8") > MAX_BYTES) {
+      if (current) chunks.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+async function translateChunk(text) {
+  const url = new URL("https://api.mymemory.translated.net/get");
+  url.searchParams.set("q", text);
+  url.searchParams.set("langpair", "id|en");
+  if (env.TRANSLATE_EMAIL) url.searchParams.set("de", env.TRANSLATE_EMAIL);
+  const res = await fetch(url, { signal: AbortSignal.timeout(1e4) });
+  if (!res.ok) throw new Error(`MyMemory status ${res.status}`);
+  const data = await res.json();
+  if (Number(data.responseStatus) !== 200 || !data.responseData?.translatedText) {
+    throw new Error(data.responseDetails || `MyMemory status ${data.responseStatus}`);
+  }
+  return data.responseData.translatedText;
+}
+async function translateField(text) {
+  if (!text.trim()) return "";
+  const out = [];
+  for (const chunk of chunkText(text)) out.push(await translateChunk(chunk));
+  return out.join(" ");
+}
+async function buildTranslations(f) {
+  const id = {
+    title: f.title,
+    summary: f.summary,
+    problem: f.problem ?? "",
+    solution: f.solution ?? "",
+    role: f.role ?? ""
+  };
+  try {
+    const en = {
+      title: await translateField(id.title),
+      summary: await translateField(id.summary),
+      problem: await translateField(id.problem),
+      solution: await translateField(id.solution),
+      role: await translateField(id.role)
+    };
+    return { translations: { id, en } };
+  } catch (err) {
+    console.error("Terjemahan gagal:", err);
+    return {
+      // Versi Inggris dikosongkan, jadi halaman memakai teks Indonesia sebagai cadangan
+      translations: { id, en: {} },
+      warning: "Terjemahan Inggris otomatis gagal. Project tersimpan dengan teks Indonesia. Simpan ulang project ini nanti."
+    };
+  }
+}
+
 // server/routes/projects.ts
 var projectsRouter = (0, import_express2.Router)();
-var include = { skills: { include: { skill: true } } };
+var include = {
+  skills: { include: { skill: true } },
+  images: { orderBy: { order: "asc" } }
+};
 async function skillLinks(names) {
   const skills = await Promise.all(
     names.map(
@@ -274,6 +361,16 @@ projectsRouter.get("/", async (req, res) => {
   });
   res.json({ data: projects.map((p) => toProjectDto(p, lang)) });
 });
+projectsRouter.get("/admin/all", requireAuth, requireAdmin, async (_req, res) => {
+  const projects = await prisma.project.findMany({
+    where: { deletedAt: null },
+    include,
+    orderBy: { createdAt: "desc" }
+  });
+  res.json({
+    data: projects.map((p) => ({ ...p, skills: p.skills.map((s) => s.skill.name) }))
+  });
+});
 projectsRouter.get("/:slug", async (req, res) => {
   const { lang } = langQuery.parse(req.query);
   const project = await prisma.project.findFirst({
@@ -284,23 +381,29 @@ projectsRouter.get("/:slug", async (req, res) => {
   res.json({ data: toProjectDto(project, lang) });
 });
 projectsRouter.post("/", requireAuth, requireAdmin, async (req, res) => {
-  const { skills, ...data } = projectInputSchema.parse(req.body);
+  const { skills, images, translations: _client, ...data } = projectInputSchema.parse(req.body);
+  const built = await buildTranslations(data);
   const project = await prisma.project.create({
     data: {
       ...data,
       githubUrl: data.githubUrl || null,
       liveUrl: data.liveUrl || null,
-      skills: { create: await skillLinks(skills) }
+      translations: built.translations,
+      skills: { create: await skillLinks(skills) },
+      images: {
+        create: images.map((img, order) => ({ ...img, caption: img.caption || null, order }))
+      }
     },
     include
   });
-  res.status(201).json({ data: toProjectDto(project) });
+  res.status(201).json({ data: toProjectDto(project), warning: built.warning });
 });
 projectsRouter.put("/:id", requireAuth, requireAdmin, async (req, res) => {
-  const { skills, ...data } = projectInputSchema.parse(req.body);
+  const { skills, images, translations: _client, ...data } = projectInputSchema.parse(req.body);
   const id = String(req.params.id);
   const existing = await prisma.project.findFirst({ where: { id, deletedAt: null } });
   if (!existing) throw new HttpError(404, "Project tidak ditemukan");
+  const built = await buildTranslations(data);
   const links = await skillLinks(skills);
   const project = await prisma.project.update({
     where: { id },
@@ -317,15 +420,16 @@ projectsRouter.put("/:id", requireAuth, requireAdmin, async (req, res) => {
       imageUrl: data.imageUrl || null,
       featured: data.featured,
       published: data.published,
-      translations: data.translations,
-      skills: {
+      translations: built.translations,
+      skills: { deleteMany: {}, create: links },
+      images: {
         deleteMany: {},
-        create: links
+        create: images.map((img, order) => ({ ...img, caption: img.caption || null, order }))
       }
     },
     include
   });
-  res.json({ data: toProjectDto(project) });
+  res.json({ data: toProjectDto(project), warning: built.warning });
 });
 projectsRouter.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
   const result = await prisma.project.updateMany({
@@ -384,18 +488,71 @@ profileRouter.get("/", async (req, res) => {
 // server/routes/contact.ts
 var import_express4 = require("express");
 var import_express_rate_limit2 = __toESM(require("express-rate-limit"));
+
+// server/services/notify.ts
+async function notifyNewContact(msg) {
+  const tasks = [];
+  if (env.RESEND_API_KEY && env.CONTACT_TO_EMAIL) {
+    tasks.push(sendEmail(msg, env.RESEND_API_KEY, env.CONTACT_TO_EMAIL));
+  }
+  if (env.FONNTE_TOKEN && env.WA_TARGET) {
+    tasks.push(sendWhatsApp(msg, env.FONNTE_TOKEN, env.WA_TARGET));
+  }
+  const results = await Promise.allSettled(tasks);
+  for (const r of results) {
+    if (r.status === "rejected") console.error("Notifikasi kontak gagal:", r.reason);
+  }
+}
+async function sendEmail(m, apiKey, to) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: "Portfolio <onboarding@resend.dev>",
+      to: [to],
+      reply_to: m.email,
+      subject: `[Portfolio] ${m.subject}`,
+      text: `Dari: ${m.name} <${m.email}>
+
+${m.message}`
+    })
+  });
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+}
+async function sendWhatsApp(m, token, target) {
+  const body = new URLSearchParams({
+    target,
+    message: `Pesan baru dari portfolio
+Nama: ${m.name}
+Email: ${m.email}
+Subjek: ${m.subject}
+
+${m.message}`
+  });
+  const res = await fetch("https://api.fonnte.com/send", {
+    method: "POST",
+    headers: { Authorization: token },
+    body
+  });
+  if (!res.ok) throw new Error(`Fonnte ${res.status}: ${await res.text()}`);
+}
+
+// server/routes/contact.ts
 var contactRouter = (0, import_express4.Router)();
 var contactLimiter = (0, import_express_rate_limit2.default)({
   windowMs: 60 * 6e4,
   limit: 5,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  message: { error: { message: "Terlalu banyak pesan dikirim, coba lagi nanti" } }
+  message: {
+    error: { message: "Terlalu banyak pesan dikirim, coba lagi nanti" }
+  }
 });
 contactRouter.post("/", contactLimiter, async (req, res) => {
   const { website, ...data } = contactSchema.parse(req.body);
   if (website) return res.status(201).json({ ok: true });
   await prisma.contactMessage.create({ data });
+  await notifyNewContact(data);
   res.status(201).json({ ok: true });
 });
 
@@ -700,13 +857,40 @@ analyticsRouter.get("/summary", requireAuth, requireAdmin, async (_req, res) => 
   });
 });
 
+// server/routes/experiences.ts
+var import_express7 = require("express");
+var experiencesRouter = (0, import_express7.Router)();
+experiencesRouter.use(requireAuth, requireAdmin);
+experiencesRouter.get("/", async (_req, res) => {
+  const data = await prisma.experience.findMany({ orderBy: { order: "asc" } });
+  res.json({ data });
+});
+experiencesRouter.post("/", async (req, res) => {
+  const data = experienceInputSchema.parse(req.body);
+  const created = await prisma.experience.create({ data });
+  res.status(201).json({ data: created });
+});
+experiencesRouter.put("/:id", async (req, res) => {
+  const data = experienceInputSchema.parse(req.body);
+  const id = String(req.params.id);
+  const result = await prisma.experience.updateMany({ where: { id }, data });
+  if (result.count === 0) throw new HttpError(404, "Pengalaman tidak ditemukan");
+  const updated = await prisma.experience.findUnique({ where: { id } });
+  res.json({ data: updated });
+});
+experiencesRouter.delete("/:id", async (req, res) => {
+  const result = await prisma.experience.deleteMany({ where: { id: String(req.params.id) } });
+  if (result.count === 0) throw new HttpError(404, "Pengalaman tidak ditemukan");
+  res.status(204).end();
+});
+
 // server/app.ts
-var app = (0, import_express7.default)();
+var app = (0, import_express8.default)();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.use((0, import_helmet.default)());
 app.use((0, import_cors.default)({ origin: env.CLIENT_ORIGIN, credentials: true }));
-app.use(import_express7.default.json({ limit: "16kb" }));
+app.use(import_express8.default.json({ limit: "16kb" }));
 app.use((0, import_cookie_parser.default)());
 app.use("/api", (0, import_express_rate_limit5.default)({ windowMs: 6e4, limit: 120, standardHeaders: "draft-7", legacyHeaders: false }));
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
@@ -716,6 +900,7 @@ app.use("/api/profile", profileRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/experiences", experiencesRouter);
 app.use("/api", (_req, res) => res.status(404).json({ error: { message: "Endpoint tidak ditemukan" } }));
 app.use(errorHandler);
 

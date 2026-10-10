@@ -28,8 +28,7 @@ export default function Login() {
     defaultValues: { email: "", password: "" },
   });
 
-  if (me.data?.user.role === "ADMIN")
-    return <Navigate to="/admin/projects" replace />;
+  if (me.data?.user.role === "ADMIN") return <Navigate to="/admin/projects" replace />;
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError("");
@@ -42,36 +41,25 @@ export default function Login() {
   });
 
   const inputClass =
-    "w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-950 dark:focus:bg-slate-950";
+    "w-full rounded-md border border-slate-300 bg-transparent py-2.5 pl-10 pr-4 text-base outline-none transition-colors placeholder:text-slate-400 focus:border-brand-700 focus:ring-2 focus:ring-brand-500/20 sm:text-sm dark:border-slate-700 dark:focus:border-brand-300";
 
   return (
-    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-10 sm:py-16">
-      <div
-        className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-brand-500/20 blur-3xl sm:size-96"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -bottom-24 -right-24 size-72 rounded-full bg-brand-700/20 blur-3xl sm:size-96"
-        aria-hidden
-      />
-
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:py-16">
       <motion.div
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-2xl shadow-slate-200/60 backdrop-blur sm:p-8 dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none"
+        className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 sm:p-8 dark:border-slate-800 dark:bg-slate-900"
       >
-        <div className="mb-6 text-center sm:mb-8">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30">
-            <Lock className="size-6" aria-hidden />
+        <div className="text-center">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-md border border-slate-300 text-slate-800 dark:border-slate-700 dark:text-slate-100">
+            <Lock className="size-5" aria-hidden />
           </div>
-          <h1 className="mt-5 text-2xl font-bold tracking-tight">
-            {t("auth.login")}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">Area khusus administrator</p>
+          <h1 className="mt-6 text-3xl leading-tight">{t("auth.login")}</h1>
+          <p className="mt-2 text-sm text-slate-500">Area khusus administrator</p>
         </div>
 
-        <form onSubmit={onSubmit} noValidate className="space-y-5">
+        <form onSubmit={onSubmit} noValidate className="mt-8 space-y-5">
           <div>
             <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
               {t("auth.email")}
@@ -88,9 +76,7 @@ export default function Login() {
                 aria-invalid={!!errors.email}
               />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
 
           <div>
@@ -109,9 +95,7 @@ export default function Login() {
                 aria-invalid={!!errors.password}
               />
             </div>
-            {errors.password && (
-              <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
 
           {serverError && (
@@ -119,18 +103,14 @@ export default function Login() {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               role="alert"
-              className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300"
+              className="flex items-start gap-2 rounded-md border border-red-200 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:text-red-300"
             >
               <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
               <span className="min-w-0 break-words">{serverError}</span>
             </motion.div>
           )}
 
-          <button
-            type="submit"
-            disabled={login.isPending}
-            className="btn-primary group w-full py-3"
-          >
+          <button type="submit" disabled={login.isPending} className="btn-primary group w-full py-3">
             <LogIn className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             {login.isPending ? t("common.loading") : t("auth.login")}
           </button>

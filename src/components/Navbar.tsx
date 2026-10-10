@@ -18,7 +18,9 @@ export default function Navbar() {
 
   const ThemeIcon = THEME_ICON[theme];
   const nextTheme = () =>
-    setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length]);
+    setTheme(
+      THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length],
+    );
 
   const isAdmin = me.data?.user.role === "ADMIN";
 
@@ -44,17 +46,30 @@ export default function Navbar() {
         className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:h-16"
         aria-label="Main"
       >
-        <Link to="/" className="min-w-0 truncate font-bold tracking-tight">
-          Satrio<span className="text-brand-500">Tegar</span>
+        <Link to="/" className="min-w-0 truncate font-serif text-xl tracking-tight">
+          SATRIO TEGAR<span className="text-brand-500"></span>
         </Link>
 
         {/* Menu desktop */}
         <div className="hidden items-center gap-6 md:flex">
-          <NavLink to="/" end className={desktopLink}>{t("nav.home")}</NavLink>
-          <NavLink to="/projects" className={desktopLink}>{t("nav.projects")}</NavLink>
-          <NavLink to="/contact" className={desktopLink}>{t("nav.contact")}</NavLink>
+          <NavLink to="/" end className={desktopLink}>
+            {t("nav.home")}
+          </NavLink>
+          <NavLink to="/projects" className={desktopLink}>
+            {t("nav.projects")}
+          </NavLink>
+          <NavLink to="/contact" className={desktopLink}>
+            {t("nav.contact")}
+          </NavLink>
           {isAdmin && (
-            <NavLink to="/admin/projects" className={desktopLink}>{t("nav.admin")}</NavLink>
+            <>
+              <NavLink to="/admin/projects" className={desktopLink}>
+                {t("nav.admin")}
+              </NavLink>
+              <NavLink to="/admin/experiences" className={desktopLink}>
+                Pengalaman
+              </NavLink>
+            </>
           )}
         </div>
 
@@ -80,7 +95,9 @@ export default function Navbar() {
 
           {isAdmin ? (
             <button
-              onClick={() => logout.mutate(undefined, { onSuccess: () => navigate("/") })}
+              onClick={() =>
+                logout.mutate(undefined, { onSuccess: () => navigate("/") })
+              }
               className="hidden rounded-md px-3 py-1.5 text-sm hover:bg-slate-100 md:block dark:hover:bg-slate-800"
             >
               {t("nav.logout")}
@@ -108,12 +125,31 @@ export default function Navbar() {
       {/* Menu mobile: flex-col agar setiap link punya baris sendiri */}
       {open && (
         <div className="flex flex-col gap-1 border-t border-slate-200 px-3 py-3 md:hidden dark:border-slate-800">
-          <NavLink to="/" end className={mobileLink} onClick={closeMenu}>{t("nav.home")}</NavLink>
-          <NavLink to="/projects" className={mobileLink} onClick={closeMenu}>{t("nav.projects")}</NavLink>
-          <NavLink to="/contact" className={mobileLink} onClick={closeMenu}>{t("nav.contact")}</NavLink>
+          <NavLink to="/" end className={mobileLink} onClick={closeMenu}>
+            {t("nav.home")}
+          </NavLink>
+          <NavLink to="/projects" className={mobileLink} onClick={closeMenu}>
+            {t("nav.projects")}
+          </NavLink>
+          <NavLink to="/contact" className={mobileLink} onClick={closeMenu}>
+            {t("nav.contact")}
+          </NavLink>
           {isAdmin ? (
             <>
-              <NavLink to="/admin/projects" className={mobileLink} onClick={closeMenu}>{t("nav.admin")}</NavLink>
+              <NavLink
+                to="/admin/projects"
+                className={mobileLink}
+                onClick={closeMenu}
+              >
+                {t("nav.admin")}
+              </NavLink>
+              <NavLink
+                to="/admin/experiences"
+                className={mobileLink}
+                onClick={closeMenu}
+              >
+                Pengalaman
+              </NavLink>
               <button
                 onClick={() => {
                   closeMenu();
@@ -125,7 +161,9 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <NavLink to="/login" className={mobileLink} onClick={closeMenu}>{t("nav.login")}</NavLink>
+            <NavLink to="/login" className={mobileLink} onClick={closeMenu}>
+              {t("nav.login")}
+            </NavLink>
           )}
         </div>
       )}

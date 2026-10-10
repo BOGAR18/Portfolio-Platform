@@ -11,6 +11,7 @@ import { profileRouter } from './routes/profile';
 import { contactRouter } from './routes/contact';
 import { chatRouter } from './routes/chat';
 import { analyticsRouter } from './routes/analytics';
+import { experiencesRouter } from './routes/experiences';
 
 export const app = express();
 
@@ -31,5 +32,6 @@ app.use('/api/profile', profileRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/analytics', analyticsRouter);
+app.use('/api/experiences', experiencesRouter);
 app.use('/api', (_req, res) => res.status(404).json({ error: { message: 'Endpoint tidak ditemukan' } }));
 app.use(errorHandler);

@@ -16,14 +16,10 @@ export default function SkillsShowcase({ skills }: { skills: SkillDto[] }) {
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Object.entries(groups).map(([category, items], gi) => (
         <Reveal key={category} delay={gi * 0.08} className="h-full">
-          <div className="group h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
-            <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300">
-                {t(`category.${category}`)}
-              </h3>
-              <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:bg-slate-800 dark:text-brand-300">
-                {items.length}
-              </span>
+          <div className="h-full rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:border-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-600">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="eyebrow">{t(`category.${category}`)}</h3>
+              <span className="text-xs text-slate-400">{items.length}</span>
             </div>
 
             <ul className="space-y-4">
@@ -31,13 +27,11 @@ export default function SkillsShowcase({ skills }: { skills: SkillDto[] }) {
                 <li key={s.id}>
                   <Link
                     to={`/projects?skill=${encodeURIComponent(s.name)}`}
-                    className="block rounded-lg transition-colors hover:text-brand-600 dark:hover:text-brand-300"
+                    className="group block rounded-md transition-colors hover:text-brand-700 dark:hover:text-brand-300"
                   >
-                    <div className="mb-1.5 flex items-center justify-between text-sm">
+                    <div className="mb-2 flex items-center justify-between text-sm">
                       <span className="font-medium">{s.name}</span>
-                      <span className="text-xs text-slate-500">
-                        {t(`level.${s.level}`)}
-                      </span>
+                      <span className="text-xs text-slate-500">{t(`level.${s.level}`)}</span>
                     </div>
 
                     <div className="flex gap-1">
@@ -53,9 +47,9 @@ export default function SkillsShowcase({ skills }: { skills: SkillDto[] }) {
                             ease: "easeOut",
                           }}
                           style={{ originX: 0 }}
-                          className={`h-1.5 flex-1 rounded-full ${
+                          className={`h-1 flex-1 ${
                             n <= s.level
-                              ? "bg-gradient-to-r from-brand-500 to-brand-700"
+                              ? "bg-brand-700 dark:bg-brand-300"
                               : "bg-slate-200 dark:bg-slate-800"
                           }`}
                         />

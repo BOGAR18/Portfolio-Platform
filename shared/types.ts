@@ -16,6 +16,7 @@ export interface ProjectDto {
   skills: string[];
   createdAt: string;
   imageUrl: string | null;
+  images: { url: string; caption: string | null }[];
 }
 
 export interface SkillDto {

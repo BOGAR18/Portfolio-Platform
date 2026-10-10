@@ -1,38 +1,73 @@
 @import "tailwindcss";
 
-/* Aktifkan variant dark: berdasarkan class .dark di <html> */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Palet warna brand. Dipakai di seluruh website dengan prefix brand-, misalnya bg-brand-600 */
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* Aksen hijau tua yang tenang. Dipakai seperlunya, bukan di mana-mana */
+  --color-brand-50: #f2f6f4;
+  --color-brand-100: #e2ebe6;
+  --color-brand-200: #c5d8ce;
+  --color-brand-300: #9fbfad;
+  --color-brand-400: #74a18a;
+  --color-brand-500: #4f836b;
+  --color-brand-600: #3b6b56;
+  --color-brand-700: #2f5746;
+  --color-brand-800: #24443a;
+  --color-brand-900: #1b332c;
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Netral hangat, menggantikan slate biru bawaan agar terasa lebih editorial */
+  --color-slate-50: #fafaf8;
+  --color-slate-100: #f3f3f0;
+  --color-slate-200: #e6e6e1;
+  --color-slate-300: #d3d3cc;
+  --color-slate-400: #a3a39b;
+  --color-slate-500: #77776f;
+  --color-slate-600: #5b5b54;
+  --color-slate-700: #44443e;
+  --color-slate-800: #2a2a26;
+  --color-slate-900: #1c1c1a;
+  --color-slate-950: #121211;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
 }
 
-/* Class tombol yang konsisten. Pakai di seluruh halaman agar tampilannya seragam */
+@layer base {
+  /* Judul memakai serif agar terasa editorial. Utility font-serif tetap bisa dipakai di tempat lain */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-200);
+    color: var(--color-slate-900);
+  }
+}
+
 @layer components {
+  /* Label kecil di atas judul, misalnya kategori atau eyebrow */
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-[0.18em] text-brand-700 dark:text-brand-300;
+  }
+
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5
-      font-medium text-white shadow-sm transition-colors hover:bg-brand-500
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-brand-700 px-5 py-2.5
+      text-sm font-medium tracking-wide text-white transition-colors hover:bg-brand-800
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
-      focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950
-      disabled:cursor-not-allowed disabled:opacity-60;
+      focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60
+      dark:bg-brand-300 dark:text-slate-900 dark:hover:bg-brand-200 dark:focus-visible:ring-offset-slate-950;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white
-      px-5 py-2.5 font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-100
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-transparent
+      px-5 py-2.5 text-sm font-medium text-slate-800 transition-colors hover:border-slate-900 hover:text-slate-900
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
       focus-visible:ring-offset-white
-      dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800
+      dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-400 dark:hover:text-white
       dark:focus-visible:ring-offset-slate-950;
   }
 }
@@ -43,11 +78,7 @@ html {
 
 body {
   -webkit-font-smoothing: antialiased;
-}
-
-::selection {
-  background-color: var(--color-brand-200);
-  color: var(--color-slate-900, #0f172a);
+  text-rendering: optimizeLegibility;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -60,16 +91,6 @@ body {
   }
 }
 
-html,
-body {
-  overflow-x: hidden;
-  max-width: 100%;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
 /* Cegah lebar halaman melebihi layar HP */
 html,
 body {
