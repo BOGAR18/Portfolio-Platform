@@ -9,7 +9,7 @@
   "db:migrate": "prisma migrate dev",
   "db:seed": "prisma db seed",
   "db:studio": "prisma studio",
-  "build:api": "esbuild server/vercel.ts --bundle --platform=node --format=cjs --packages=external --outfile=\"api/[...path].js\""
+  "build:api": "esbuild server/vercel.ts --bundle --platform=node --format=cjs --packages=external --outfile=api/index.js"
 },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
